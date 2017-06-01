@@ -15,12 +15,8 @@ class CurrencyHelper:
 
 		self.payload  = 'coin=btc&cur=btcusd&ex=waex&dec=2'
 
-		print(self.payload)
-
-		result = self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php?' + self.payload, '' , self.defaultHeaders)
+		result = self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php?' + self.payload , '' , self.defaultHeaders)
 		
-		print(result)
-
 		response 	  = self.client.getresponse().read().decode('utf-8')
 		
 		self.prices   = json.loads(response)
@@ -31,9 +27,11 @@ class CurrencyHelper:
 
 		self.payload  = 'coin=eth&cur=ethusd&ex=waex&dec=2'
 		
-		self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php' + self.payload, '' , self.defaultHeaders)
+		self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php', self.payload , self.defaultHeaders)
 		
 		response 	  = self.client.getresponse().read().decode('utf-8')
+
+		print()
 
 		self.prices   = json.loads(response)
 

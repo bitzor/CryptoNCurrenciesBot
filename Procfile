@@ -1,0 +1,1 @@
+worker: python init.py --log-file -

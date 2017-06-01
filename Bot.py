@@ -74,7 +74,7 @@ class Bot:
 			text = " *ETH*: " + prices['current_price']+ ' USD'
 		elif(command == '/all'):
 			text = " *BTC*: " + prices['bitcoin']['current_price']  + ' USD\n' + "*ETH*: " + prices['ethereum']['current_price'] + ' USD '
-		elif(command == '/start'):
+		elif(command == '/start' or command == '/help'):
 			text = """
 				*Welcome to EthBitBot!*
 

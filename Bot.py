@@ -1,11 +1,11 @@
 from ApiWrapper import *
-from Helper import *
+from CurrencyHelper import *
 from threading import Timer
 
 class Bot: 
 
 	def __init__(self):
-		self.helper  	  = Helper()
+		self.helper  	  = CurrencyHelper()
 		self.wrapper 	  = ApiWrapper()
 		self.bot 	 	  = Timer(2, self.listen)
 		self.updates 	  = []

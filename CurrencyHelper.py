@@ -1,7 +1,7 @@
 import http
 import json
 
-class Helper:
+class CurrencyHelper:
 	def __init__(self):
 
 		self.client = http.client.HTTPSConnection('ethereumprice.org', 443)
@@ -17,8 +17,10 @@ class Helper:
 
 		print(self.payload)
 
-		self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php', self.payload , self.defaultHeaders)
+		result = self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php', self.payload , self.defaultHeaders)
 		
+		print(result)
+
 		response 	  = self.client.getresponse().read().decode('utf-8')
 		
 		self.prices   = json.loads(response)

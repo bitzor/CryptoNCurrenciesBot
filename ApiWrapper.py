@@ -1,20 +1,43 @@
+from urllib import parse
 import http.client
+import json
+
 
 class ApiWrapper:
 	def __init__(self, botToken = '386677141:AAHmjcer9dLqwvFctWm6h9nBLmMXTxS3qyg'):
-		self.botToken = botToken
-		self.defaultHeaders = {"Content-type": "application/x-www-form-urlencoded"}
-		self.client = http.client.HTTPSConnection('api.telegram.org', 443)
+		self.botToken 		= botToken
+		self.defaultHeaders = {"Content-type": "application/json"}
+		self.client 		= http.client.HTTPSConnection('api.telegram.org', 443)
+		pass
 
-	def getUpdates(self):
+	def getUpdates(self, lastUpdateId):
+		updates = {}
+		message = 'OK'
+		payload = json.dumps({'offset': lastUpdateId})
 		try:
-			result = self.client.request('GET', '/bot'+ self.botToken + '/getUpdates', '' , self.defaultHeaders)
-			response = self.client.getresponse()
-			body = response.read()
-			#command = body.result[0].message.text[1:]
-			print(body)
+			result   		= self.client.request('GET', '/bot'+ self.botToken + '/getUpdates', payload , self.defaultHeaders)
+			response 		= self.client.getresponse()
+			raw_body 		= response.read().decode('utf-8')
+			json_response 	= json.loads(raw_body)
 
+			if(json_response['ok'] and len(json_response['result']) > 0):
+				updates = json_response['result']
+			else:
+				message = 'No updates available'
 		except:
 		    raise
 		
-		pass
+		return {'updates': updates, 'message': message}
+
+	def sendResponse(self, chatId, message):
+		payload = json.dumps({'chat_id': chatId, 'text': message})
+		try:
+			print("Sending response: " + message)
+			print(payload)
+			result   = self.client.request('POST', '/bot'+ self.botToken + '/sendMessage', payload , self.defaultHeaders)
+			response = self.client.getresponse()
+			body 	 = response.read()
+			return body
+		except:
+		    raise
+		pass		

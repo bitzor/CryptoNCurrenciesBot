@@ -1,4 +1,3 @@
-from urllib import parse
 import http.client
 import json
 
@@ -30,7 +29,7 @@ class ApiWrapper:
 		return {'updates': updates, 'message': message}
 
 	def sendResponse(self, chatId, message):
-		payload = json.dumps({'chat_id': chatId, 'text': message})
+		payload = json.dumps({'chat_id': chatId, 'text': message, 'parse_mode': 'MARKDOWN'})
 		try:
 			print("Sending response: " + message)
 			print(payload)

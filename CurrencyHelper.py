@@ -4,7 +4,7 @@ import json
 class CurrencyHelper:
 	def __init__(self):
 
-		self.client = http.client.HTTPSConnection('ethereumprice.org', 443)
+		self.client = http.client.HTTPSConnection('v2.ethereumprice.org', 8080)
 		self.defaultHeaders = {"Content-type": "application/x-www-form-urlencoded"}
 		self.payload = ''
 		self.prices  = ''
@@ -13,26 +13,24 @@ class CurrencyHelper:
 
 	def getBtcPrice(self):
 
-		self.payload  = 'coin=btc&cur=btcusd&ex=waex&dec=2'
-
-		result = self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php?' + self.payload , '' , self.defaultHeaders)
+		result = self.client.request('GET', '/snapshot/btc/usd/waex/24h' + self.payload , '' , self.defaultHeaders)
 		
 		response 	  = self.client.getresponse().read().decode('utf-8')
 		
+		self.client.close()
+
 		self.prices   = json.loads(response)
 
 		return self.prices
 
 	def getEthPrice(self):
 
-		self.payload  = 'coin=eth&cur=ethusd&ex=waex&dec=2'
-		
-		self.client.request('GET', '/wp-content/themes/theme/inc/exchanges/price-data.php', self.payload , self.defaultHeaders)
+		self.client.request('GET', '/snapshot/eth/usd/waex/24h', self.payload , self.defaultHeaders)
 		
 		response 	  = self.client.getresponse().read().decode('utf-8')
 
-		print()
-
+		self.client.close()
+		
 		self.prices   = json.loads(response)
 
 		return self.prices		

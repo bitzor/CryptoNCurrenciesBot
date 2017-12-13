@@ -5,9 +5,9 @@ from threading import Timer
 class Bot: 
 
 	def __init__(self):
+		self.bot 	 	  = Timer(2, self.listen)
 		self.helper  	  = CurrencyHelper()
 		self.wrapper 	  = ApiWrapper()
-		self.bot 	 	  = Timer(2, self.listen)
 		self.updates 	  = []
 		self.lastUpdateId = ''
 		pass
@@ -18,6 +18,7 @@ class Bot:
 
 	def listen(self):
 		""" Thread to listen incoming updates """
+
 		print('Listening updates...')
 		
 		response = self.wrapper.getUpdates(self.lastUpdateId)
@@ -69,11 +70,16 @@ class Bot:
 		text = ''
 
 		if(command == '/bitcoin'):
-			text = "*BTC*: " + prices['current_price']+ ' USD'
+			btc = repr(prices['data']['price'])
+			text = "*BTC*: " + btc + ' USD'
 		elif(command == '/ethereum'):
-			text = " *ETH*: " + prices['current_price']+ ' USD'
+			eth = repr(prices['data']['price'])
+			text = " *ETH*: " + eth + ' USD'
 		elif(command == '/all'):
-			text = " *BTC*: " + prices['bitcoin']['current_price']  + ' USD\n' + "*ETH*: " + prices['ethereum']['current_price'] + ' USD '
+			btc = repr(prices['bitcoin']['data']['price'])
+			eth = repr(prices['ethereum']['data']['price'])
+			
+			text = " *BTC*: " + btc  + ' USD\n' + "*ETH*: " + eth + ' USD '
 		elif(command == '/start' or command == '/help'):
 			text = """
 				*Welcome to EthBitBot!*

@@ -3,7 +3,7 @@ import json
 
 
 class ApiWrapper:
-	def __init__(self, botToken = '386677141:AAHmjcer9dLqwvFctWm6h9nBLmMXTxS3qyg'):
+	def __init__(self, botToken = '458287424:AAHI0-WT61_uM6um1JtDsKOl5_VyZVEORoo'):
 		self.botToken 		= botToken
 		self.defaultHeaders = {"Content-type": "application/json"}
 		self.client 		= http.client.HTTPSConnection('api.telegram.org', 443)

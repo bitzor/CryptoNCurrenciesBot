@@ -1,11 +1,12 @@
 from ApiWrapper import *
 from CurrencyHelper import *
 from threading import Timer
+from datetime import date, datetime
 
 class Bot: 
 
 	def __init__(self):
-		self.bot 	 	  = Timer(2, self.listen)
+		self.bot 	 	  = Timer(1, self.listen)
 		self.helper  	  = CurrencyHelper()
 		self.wrapper 	  = ApiWrapper()
 		self.updates 	  = []
@@ -13,21 +14,20 @@ class Bot:
 		pass
 
 	def start(self):
+		print('Listening updates...')
 		self.bot.start()
 		pass
 
 	def listen(self):
-		""" Thread to listen incoming updates """
+		''' Thread to listen incoming updates '''
 
-		print('Listening updates...')
-		
-		response = self.wrapper.getUpdates(self.lastUpdateId)
+		updates = self.wrapper.getUpdates(self.lastUpdateId)
 
-		if(response['message'] == 'OK'):
-			self.updates = response['updates']
+		if(updates['message'] == 'OK'):
+			self.updates = updates['updates']
 			self.processUpdates()
 		else: 
-			print(response['message'])
+			print(updates['message'])
 
 		handler = Timer(1, self.listen)
 		handler.start()
@@ -35,58 +35,63 @@ class Bot:
 		pass
 
 	def processUpdates(self):
-		for update in self.updates:			
-			name	=  update['message']['from']['first_name'] 
+		for update in self.updates:
+			name	= update['message']['from']['first_name'] 
 			chat_id = update['message']['chat']['id']
 			command = update['message']['text']
 
-			print("Incoming command from " + name + ': '+ command)
+			command_response = self.processCommand(command)
 
-			response = self.processCommand(chat_id, command)
-			print(response)
-			print(type(response))
-			self.wrapper.sendResponse(chat_id, response)
-
+			self.wrapper.sendResponse(chat_id, command_response)
+			
+			print('Incoming command from ' + name + ': '+ command)
 		else:
 			self.lastUpdateId = update['update_id'] + 1
-			print(self.lastUpdateId)
 		pass
 
-	def processCommand(self, chat_id, command):
-		prices =  {}
+	def processCommand(self, command):
+		emoji = u'\U0001F4B9'
+		dt = datetime.today().strftime('%A, %d/%m/%Y - %I:%M:%S %p')
+		response = '*Price Summary* ' + emoji + '\n' + dt + ' \n\n'
 
-		if(command == '/bitcoin'):
-			prices = self.helper.getBtcPrice()
-		elif(command == '/ethereum'):
-			prices = self.helper.getEthPrice()
-		elif(command == '/all'):
-			prices = self.helper.getPrices()
+		if (command == '/all'):
+			response += self.processAllCommand()
+		elif(command == '/bitcoin' or command == '/btc'):
+			response += self.processBtcCommand()
+		elif(command == '/ethereum' or command == '/eth'):
+			response += self.processEthCommand()
+		elif(command == '/help' or command == '/start'):
+			response = self.helpCommand()
+		else:
+			response = '*No command available*'
+		return response
 
-		response = self.prepareResponse(prices, command)
+	def processBtcCommand(self):
+
+		price = self.helper.getBtcPrice()
+		btc = repr(price['data']['price'])
+		emoji = u'\U0001F4B8'
+		return '*BTC*: ' + btc + ' USD' + emoji
+
+	def processEthCommand(self):
+
+		price = self.helper.getEthPrice()
+		eth = repr(price['data']['price'])
+		emoji = u'\U0001F539'
+		return '*ETH*: ' + eth + ' USD' + emoji
+
+	def processAllCommand(self):
+		
+		response = self.processBtcCommand()
+		response += '\n' + self.processEthCommand()
 
 		return response
-		
-	def prepareResponse(self, prices, command):
-		text = ''
 
-		if(command == '/bitcoin'):
-			btc = repr(prices['data']['price'])
-			text = "*BTC*: " + btc + ' USD'
-		elif(command == '/ethereum'):
-			eth = repr(prices['data']['price'])
-			text = " *ETH*: " + eth + ' USD'
-		elif(command == '/all'):
-			btc = repr(prices['bitcoin']['data']['price'])
-			eth = repr(prices['ethereum']['data']['price'])
-			
-			text = " *BTC*: " + btc  + ' USD\n' + "*ETH*: " + eth + ' USD '
-		elif(command == '/start' or command == '/help'):
-			text = """
-				*Welcome to EthBitBot!*
+	def helpCommand(self): 
+		return '''
+				*Welcome to CryptoCurrenciesBot!*
 
 				- Use _/all_ command to query all Bitcoin and Ethereum Prices
-				- Use _/bitcoin_ to query Bitcoin price
-				- Use _/ethereum_ to query Ethereum price
-			"""
-
-		return text
+				- Use _/bitcoin_ or _/btc_ to query Bitcoin price
+				- Use _/ethereum_ or _/eth_ to query Ethereum price
+			'''

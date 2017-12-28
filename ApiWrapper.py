@@ -10,9 +10,11 @@ class ApiWrapper:
 		pass
 
 	def getUpdates(self, lastUpdateId):
+
+		payload = json.dumps({'offset': lastUpdateId})
 		updates = {}
 		message = 'OK'
-		payload = json.dumps({'offset': lastUpdateId})
+		
 		try:
 			result   		= self.client.request('GET', '/bot'+ self.botToken + '/getUpdates', payload , self.defaultHeaders)
 			response 		= self.client.getresponse()

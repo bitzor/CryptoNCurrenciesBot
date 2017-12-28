@@ -11,29 +11,27 @@ class CurrencyHelper:
 
 		pass
 
-	def getBtcPrice(self):
+	def makeRequest(self, url):
 
-		result = self.client.request('GET', '/snapshot/btc/usd/waex/24h' + self.payload , '' , self.defaultHeaders)
-		
-		response 	  = self.client.getresponse().read().decode('utf-8')
-		
+		self.client.request('GET', url + self.payload , '' , self.defaultHeaders)
+
+		response = self.client.getresponse().read().decode('utf-8')
+
+		self.prices = json.loads(response)
+
 		self.client.close()
 
-		self.prices   = json.loads(response)
+		return self.prices		
 
-		return self.prices
+	def getBtcPrice(self):
+
+		url = '/snapshot/btc/usd/waex/24h'
+		return self.makeRequest(url)
 
 	def getEthPrice(self):
 
-		self.client.request('GET', '/snapshot/eth/usd/waex/24h', self.payload , self.defaultHeaders)
-		
-		response 	  = self.client.getresponse().read().decode('utf-8')
-
-		self.client.close()
-		
-		self.prices   = json.loads(response)
-
-		return self.prices		
+		url = '/snapshot/eth/usd/waex/24h'
+		return self.makeRequest(url)
 
 	def getPrices(self):
 
@@ -41,3 +39,4 @@ class CurrencyHelper:
 		eth = self.getEthPrice()
 
 		return {'bitcoin': btc, 'ethereum': eth}
+
